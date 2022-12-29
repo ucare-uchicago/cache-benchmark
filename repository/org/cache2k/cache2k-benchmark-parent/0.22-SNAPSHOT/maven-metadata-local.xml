@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>org.cache2k.benchmark</groupId>
+  <artifactId>cache2k-benchmark-parent</artifactId>
+  <version>0.22-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20210312143134</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>0.22-SNAPSHOT</value>
+        <updated>20210312143134</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.cache2k.benchmark</groupId>
+  <artifactId>clockProPlus</artifactId>
+  <versioning>
+    <versions>
+      <version>0.22-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20210312143136</lastUpdated>
+  </versioning>
+</metadata>

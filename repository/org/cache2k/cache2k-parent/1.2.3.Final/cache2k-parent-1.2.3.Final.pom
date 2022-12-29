@@ -1,0 +1,626 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.cache2k</groupId>
+  <artifactId>cache2k-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>1.2.3.Final</version>
+  <name>cache2k parent</name>
+
+  <description>A light weight and high performance Java caching library. Android and Java 6 compatible.</description>
+
+  <url>https://cache2k.org</url>
+  <inceptionYear>2000</inceptionYear>
+
+  <organization>
+    <name>headissue GmbH, Munich</name>
+    <url>https://headissue.com</url>
+  </organization>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/cache2k/cache2k/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com:cache2k/cache2k.git</connection>
+    <developerConnection>scm:git:git@github.com:cache2k/cache2k.git</developerConnection>
+    <url>https://github.com/cache2k/cache2k.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Jens Wilke</name>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>cache2k-base-bom</module>
+    <module>cache2k-api</module>
+    <module>cache2k-all</module>
+    <module>cache2k-core</module>
+    <module>cache2k-osgi-all</module>
+    <module>cache2k-schemas</module>
+    <!-- not deployed on OSS central -->
+    <module>test-parent</module>
+    <module>cache2k-jcache-tests</module>
+    <module>test-osgi</module>
+    <module>documentation</module>
+    <module>cache2k-testing</module>
+    <!-- other, deployed -->
+    <module>cache2k-spring</module>
+    <module>cache2k-jcache</module>
+    <!-- a deployed module must be last for the
+         nexus staging deploy / OSS release -->
+  </modules>
+
+  <properties>
+    <series>latest</series>
+    <buildNumber>undefined</buildNumber>
+    <timestamp>0</timestamp>
+    <gitBranch>unknown</gitBranch>
+    <gitSha1>unknown</gitSha1>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jcache.version>1.1.0</jcache.version>
+    <jacoco-maven-plugin-version>0.7.5.201505241946</jacoco-maven-plugin-version>
+    <h7e.recycle.test.coverage>jacoco-instrument</h7e.recycle.test.coverage>
+    <android.plugin.version>4.5.0</android.plugin.version>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.7.0</version>
+          <configuration>
+            <useIncrementalCompilation>false</useIncrementalCompilation>
+            <source>1.6</source>
+            <target>1.6</target>
+            <compilerArgs>
+              <arg>-Xlint:deprecation</arg>
+              <arg>-Xlint:unchecked</arg>
+            </compilerArgs>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>1.5</version>
+          <configuration>
+            <licenseName>apache_v2</licenseName>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+              <manifestEntries>
+                <Implementation-Build>${buildNumber}</Implementation-Build>
+                <X-Git-Branch>${gitBranch}</X-Git-Branch>
+                <X-Git-SHA1>${gitSha1}</X-Git-SHA1>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <!--
+          Always exclude long running timing tests. Run tests in parallel.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.0</version>
+          <configuration>
+            <trimStackTrace>false</trimStackTrace>
+            <excludedGroups>org.cache2k.testing.category.StorageTests,org.cache2k.testing.category.TimingTests,org.cache2k.testing.category.ExclusiveTests</excludedGroups>
+            <runOrder>random</runOrder>
+            <parallel>classes</parallel>
+            <threadCount>1</threadCount>
+            <perCoreThreadCount>true</perCoreThreadCount>
+            <systemPropertyVariables>
+              <org.cache2k.core.HeapCache.Tunable.sharpExpirySafetyGapMillis>7654</org.cache2k.core.HeapCache.Tunable.sharpExpirySafetyGapMillis>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.19.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+
+        <!-- needed for the special site theme -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.3</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.doxia</groupId>
+              <artifactId>doxia-module-markdown</artifactId>
+              <version>1.4</version>
+            </dependency>
+
+            <dependency>
+              <groupId>lt.velykis.maven.skins</groupId>
+              <artifactId>reflow-velocity-tools</artifactId>
+              <version>1.1.1</version>
+            </dependency>
+            <!-- Reflow skin requires Velocity >= 1.7  -->
+            <dependency>
+              <groupId>org.apache.velocity</groupId>
+              <artifactId>velocity</artifactId>
+              <version>1.7</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.0.1</version>
+
+          <configuration>
+            <additionalJOption>-Xdoclint:all</additionalJOption>
+            <additionalJOption>-Xdoclint:-missing</additionalJOption>
+            <!-- no aggregation, we want to have docs on the API package alone -->
+            <!--
+            <linksource>true</linksource>
+            -->
+            <links>
+              <link>https://docs.oracle.com/javase/8/docs/api/</link>
+              <link>https://cache2k.org/docs/jcache/1.1.0/apidocs/cache-api/</link>
+            </links>
+            <quiet>true</quiet>
+            <bottom>
+              <![CDATA[<a href="http://cache2k.org" target="_blank">cache2k</a> API documentation. Copyright &#169; {inceptionYear}&#x2013;{currentYear} <a href="http://headissue.com" target="_blank">headissue GmbH, Munich</a>.]]>
+            </bottom>
+            <detectOfflineLinks>false</detectOfflineLinks>
+          </configuration>
+        </plugin>
+
+
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <configuration>
+            <executable>gpg2</executable>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <!-- taken from sonatype oss parent -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- taken from sonatype oss parent -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <executions>
+          <execution>
+            <id>enforce-versions</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.0.5</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>1.8</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+    <extensions>
+      <!-- Needed for scpexe deploy -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+      </extension>
+    </extensions>
+  </build>
+
+  <distributionManagement>
+    <site>
+      <id>cache2k</id>
+      <url>file:/tmp/cache2k-site</url>
+    </site>
+  </distributionManagement>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.7</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <!-- COPY OF BUILD SECTION -->
+          <additionalJOption>-Xdoclint:all</additionalJOption>
+          <additionalJOption>-Xdoclint:-missing</additionalJOption>
+          <!--
+          <linksource>true</linksource>
+          -->
+          <links>
+            <link>https://docs.oracle.com/javase/8/docs/api/</link>
+            <link>https://cache2k.org/docs/jcache/1.1.0/apidocs/cache-api/</link>
+          </links>
+          <quiet>true</quiet>
+          <bottom>
+            <![CDATA[<a href="http://cache2k.org" target="_blank">cache2k</a> API documentation. Copyright &#169; {inceptionYear}&#x2013;{currentYear} <a href="http://headissue.com" target="_blank">headissue GmbH, Munich</a>.]]>
+          </bottom>
+          <detectOfflineLinks>false</detectOfflineLinks>        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>html</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <profiles>
+
+    <!--
+         Profile is used to deploy an internal pre release for integration tests with the
+         rest of the headissue software.
+    -->
+    <profile>
+      <id>headissue-release</id>
+      <distributionManagement>
+        <repository>
+          <id>headissue.public</id>
+          <name>headissue public repository</name>
+          <url>${h7e.release.deploy.url}</url>
+        </repository>
+        <snapshotRepository>
+          <id>headissue.snapshot</id>
+          <name>Internal Snapshot Repository</name>
+          <url>${h7e.snapshot.deploy.url}</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+
+    <!-- profile used for the oss release via sonatype. This is taken from
+         oss-parent-9.pom -->
+    <profile>
+      <id>sonatype-oss-release</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>sonatype-nexus-snapshots</id>
+          <name>Sonatype Nexus Snapshots</name>
+          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+          <id>sonatype-nexus-staging</id>
+          <name>Nexus Release Repository</name>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <!-- sign artifact, see:
+               https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+               override sonatype key signing to configure correct key name
+               -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <configuration>
+              <keyname>D37F5C87</keyname>
+            </configuration>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>sonatype-nexus-staging</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <!-- skip remote stating lets us inspect the locally staged artifacts first
+              -->
+              <skipRemoteStaging>true</skipRemoteStaging>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- enabling the jacoco agent for running the tests. results are written to target/jacoco.exec -->
+    <profile>
+      <id>jacoco-instrument</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin-version}</version>
+            <executions>
+              <execution>
+                <id>default-prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- profile to merge a report for the total test coverage. use it with
+         mvn -Pjacoco-merge jacoco:merge jacoco:report -->
+    <profile>
+      <id>jacoco-merge</id>
+      <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin-version}</version>
+                <configuration>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.basedir}</directory>
+                            <includes>
+                                <include>**/*.exec</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
+                    <destFile>${project.build.directory}/jacoco.exec</destFile>
+                </configuration>
+            </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+         profile for doing static analysis, normal reports are switched off
+         run with: mvn -Pstatic-analysis site
+    -->
+    <profile>
+      <id>static-analysis</id>
+      <!-- pmd gets called directly via pmd:pmd, which uses the configuration in the build scope
+           and not the reporting scope used by site builds.
+           we don't use the site build, since this generates documentation etc. and we want
+           like to generate the static analytics metrics separately.
+      -->
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.7</version>
+            <configuration>
+              <targetJdk>1.8</targetJdk>
+              <linkXRef>false</linkXRef>
+			  <rulesets>
+			  	<ruleset>${user.dir}/config/pmd-rulesets.xml</ruleset>
+			  </rulesets>
+              <skipEmptyReport>false</skipEmptyReport>
+              <excludes>
+                <!-- exclusions for code from JSR107 TCK -->
+                <exclude>org/jsr107/**/*.java</exclude>
+                <exclude>domain/*.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.8.1</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <!-- generate no normal report at all -->
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+
+    <!-- fast tests are run with coverage -->
+    <profile>
+      <id>fast-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <!-- we only exclude, so TCK tests or unmarked tests run also -->
+            <configuration>
+              <excludedGroups>org.cache2k.testing.category.StorageTests,org.cache2k.testing.category.SlowTests,org.cache2k.testing.category.TimingTests,org.cache2k.testing.category.ExclusiveTests</excludedGroups>
+              <!-- jacoco instrumentation is not working GC debugging....
+              <argLine>-Xmx256m -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDetails</argLine>
+              -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>fast-tests-real-clock</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <!-- we only exclude, so TCK tests or unmarked tests run also -->
+            <configuration>
+              <excludedGroups>org.cache2k.testing.category.StorageTests,org.cache2k.testing.category.SlowTests,org.cache2k.testing.category.TimingTests,org.cache2k.testing.category.ExclusiveTests</excludedGroups>
+              <systemPropertyVariables>
+                <disableSimulatedClock>true</disableSimulatedClock>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>slow-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <groups>org.cache2k.testing.category.SlowTests</groups>
+              <parallel>classes</parallel>
+              <perCoreThreadCount>true</perCoreThreadCount>
+              <threadCount>1</threadCount>
+              <!-- Reduce heap memory to detect leaks. -->
+              <argLine>-Xmx128m -XX:+HeapDumpOnOutOfMemoryError -XX:OnOutOfMemoryError="kill -3 %p"</argLine>
+              <!-- make this test more verbose to investigate a VM crash
+              <argLine>-Xmx128m -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDetails -XX:OnOutOfMemoryError="kill -3 %p"</argLine>
+              <argLine>-XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGC -XX:+PrintCompilation</argLine>
+              <argLine>-XX:+PrintGC</argLine>
+              -->
+              <!--
+                   Use a lower safety gap, since some tests will use a time value for expiry higher then
+                   the safety gap.
+              -->
+              <systemPropertyVariables>
+                <org.cache2k.core.HeapCache.Tunable.sharpExpirySafetyGapMillis>1765</org.cache2k.core.HeapCache.Tunable.sharpExpirySafetyGapMillis>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>android</id>
+      <modules>
+        <module>test-android</module>
+        <module>test-android-proguard</module>
+      </modules>
+    </profile>
+
+  </profiles>
+
+</project>
