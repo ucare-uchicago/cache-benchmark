@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+**/**/.DS_Store
+**/**/.project
+target
+.ipynb_checkpoints
+.settings
+**/.settings
+inf-workload-traces/
